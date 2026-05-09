@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>وزارة الصحة الكويتية | بوابة نتائج القبول</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary-color: #059669; --bg-color: #ffffff; --whatsapp-color: #25D366; }
+        html, body { height: 100%; margin: 0; padding: 0; background-color: var(--bg-color); overflow-x: hidden; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; }
+        .card { background: #fff; width: 100%; min-height: 100vh; padding: 20px; box-sizing: border-box; border-top: 12px solid var(--primary-color); display: flex; flex-direction: column; align-items: center; }
+        @media (min-width: 500px) { .card { max-width: 500px; } }
+        .logo-container { width: 100%; display: flex; justify-content: center; margin: 20px 0; padding: 0 5%; box-sizing: border-box; }
+        .logo { width: 100%; max-width: 320px; height: auto; }
+        h2 { color: var(--primary-color); margin: 5px 0; font-size: 1.6rem; text-align: center; }
+        .subtitle { color: #666; font-size: 0.9em; margin-bottom: 30px; text-align: center; }
+        input { width: 100%; padding: 18px; border: 1.5px solid #ddd; border-radius: 12px; font-size: 18px; text-align: center; box-sizing: border-box; margin-bottom: 15px; font-weight: bold; background: #fdfdfd; outline: none; }
+        button.btn-search { width: 100%; padding: 18px; background-color: var(--primary-color); color: white; border: none; border-radius: 12px; font-size: 19px; font-weight: bold; cursor: pointer; }
+        
+        .loader { display: none; border: 5px solid #f3f3f3; border-top: 5px solid var(--primary-color); border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        #printableResult { display: none; width: 100%; margin-top: 20px; padding: 20px; border: 1px solid #eee; border-radius: 15px; background-color: #fff; position: relative; text-align: right; box-sizing: border-box; }
+        #noDataBox { display: none; width: 100%; margin-top: 20px; padding: 20px; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 12px; text-align: center; font-weight: bold; }
+        
+        .res-header { text-align: center; color: var(--primary-color); font-weight: bold; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; margin-bottom: 20px; position: relative; z-index: 2; }
+        .res-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f9f9f9; font-size: 14px; position: relative; z-index: 2; }
+        .res-label { color: #555; font-weight: 600; min-width: 145px; }
+        .res-val { color: var(--primary-color); font-weight: bold; text-align: left; flex: 1; }
+        
+        .stamp-bg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 180px; opacity: 0.15; z-index: 1; pointer-events: none; }
+        
+        .status-badge { background: #d4edda; color: #155724; padding: 15px; border-radius: 12px; text-align: center; font-weight: bold; margin-top: 20px; font-size: 1.2rem; border: 1px solid #c3e6cb; position: relative; z-index: 2; }
+        
+        .whatsapp-btn { display: flex; align-items: center; justify-content: center; width: 100%; background-color: var(--whatsapp-color); color: white; text-decoration: none; text-align: center; padding: 18px 10px; border-radius: 12px; margin-top: 15px; font-weight: bold; font-size: 15px; border: none; cursor: pointer; transition: 0.3s; position: relative; z-index: 2; }
+        .whatsapp-btn i { margin-left: 10px; font-size: 24px; }
+        .whatsapp-btn:hover { background-color: #1eb954; }
+
+        .validity { color: #d32f2f; font-size: 11px; text-align: center; margin-top: 15px; font-weight: bold; line-height: 1.6; position: relative; z-index: 2; }
+        .instructions { color: #059669; font-size: 12px; text-align: center; margin-top: 10px; font-weight: 500; line-height: 1.5; padding: 0 10px; position: relative; z-index: 2; }
+        
+        footer { margin-top: auto; padding: 20px 0; font-size: 11px; color: #aaa; text-align: center; width: 100%; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="logo-container"><img src="logo.jpg" alt="وزارة الصحة" class="logo"></div>
+    <h2>وزارة الصحة الكويتية</h2>
+    <p class="subtitle">بوابة الاستعلام عن نتائج التعاقدات الطبية</p>
+
+    <input type="text" id="refID" placeholder="أدخل رقم المعاملة">
+    <button class="btn-search" onclick="search()">استعلام عن الحالة</button>
+
+    <div id="loader" class="loader"></div>
+    <div id="noDataBox">رقم المعاملة غير صحيح أو قيد الفرز حالياً</div>
+
+    <div id="printableResult">
+        <img src="stamp.png" class="stamp-bg" alt="ختم">
+        <div class="res-header">تفاصيل اعتماد القبول المبدئي</div>
+        
+        <div class="res-row"><span class="res-label">رقم المعاملة:</span> <span class="res-val" id="outRef"></span></div>
+        <div class="res-row"><span class="res-label">الاسم بالكامل:</span> <span class="res-val" id="outName"></span></div>
+        <div class="res-row"><span class="res-label">المسمى الوظيفي:</span> <span class="res-val" id="outSpec"></span></div>
+        <div class="res-row"><span class="res-label">مكان الإقامة:</span> <span class="res-val" id="outLoc"></span></div>
+        <div class="res-row"><span class="res-label">جهة العمل:</span> <span class="res-val">مستشفيات وزارة الصحة</span></div>
+        <div class="res-row"><span class="res-label">نوع العقد:</span> <span class="res-val">تعاقد خارجي (رسمي)</span></div>
+        
+        <div class="status-badge">مقبول مبدئياً ✅</div>
+
+        <a id="whatsappLink" href="#" target="_blank" class="whatsapp-btn">
+            <i class="fab fa-whatsapp"></i>
+            تأكيد الاستلام وجدولة المعاينة الفنية
+        </a>
+
+        <div class="validity">⚠️ يجب مراجعة الوكالة خلال 48 ساعة لتأكيد المستندات.</div>
+        <div class="instructions">سيقوم القسم الإداري بالتواصل معكم لتوضيح تفاصيل المخصصات المالية وتذاكر السفر وإجراءات الفيزا الطبية.</div>
+    </div>
+
+    <footer>جميع الحقوق محفوظة © 2026 - وكالة نورس للتوظيف الطبي بالتنسيق مع MOH</footer>
+</div>
+
+<script>
+const MY_PHONE_NUMBER = "249993368535";
+
+// إضافة متقدم تجريبي واحد للاختبار
+const applicantsData = [
+    { id: "NORAS-MED-101", name: "تجربة متقدم طبي", spec: "طبيب ممارس عام", loc: "الخرطوم - السودان" }
+];
+
+function search() {
+    const userInput = document.getElementById('refID').value.trim();
+    const userNumbers = userInput.replace(/\D/g, ''); 
+
+    const resultBox = document.getElementById('printableResult');
+    const noDataBox = document.getElementById('noDataBox');
+    const loader = document.getElementById('loader');
+
+    resultBox.style.display = "none";
+    noDataBox.style.display = "none";
+    
+    if (!userInput) { 
+        alert("يرجى إدخال رقم المعاملة");
+        return; 
+    }
+
+    loader.style.display = "block";
+
+    setTimeout(() => {
+        loader.style.display = "none";
+        
+        const person = applicantsData.find(p => p.id.includes(userNumbers));
+
+        if(person) {
+            document.getElementById('outRef').textContent = person.id;
+            document.getElementById('outName').textContent = person.name;
+            document.getElementById('outSpec').textContent = person.spec;
+            document.getElementById('outLoc').textContent = person.loc;
+
+            const message = `*إشعار قبول طبي (وكالة نورس)*\n` +
+                            `--------------------------\n` +
+                            `لقد تلقيت نتيجة القبول المبدئي وأريد ترتيب المعاينة.\n\n` +
+                            `*البيانات:*\n` +
+                            `- الملف: ${person.id}\n` +
+                            `- الاسم: ${person.name}\n` +
+                            `- التخصص: ${person.spec}\n` +
+                            `- الإقامة: ${person.loc}`;
+            
+            const encodedMessage = encodeURIComponent(message);
+            document.getElementById('whatsappLink').href = `https://wa.me/${MY_PHONE_NUMBER}?text=${encodedMessage}`;
+
+            resultBox.style.display = "block";
+        } else {
+            noDataBox.style.display = "block";
+        }
+    }, 1200);
+}
+</script>
+</body>
+</html>
