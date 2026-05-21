@@ -65,7 +65,7 @@
         <div class="res-row"><span class="res-label">المسمى الوظيفي:</span> <span class="res-val" id="outSpec"></span></div>
         <div class="res-row"><span class="res-label">مكان الإقامة:</span> <span class="res-val" id="outLoc"></span></div>
         <div class="res-row"><span class="res-label">جهة العمل:</span> <span class="res-val">مستشفيات وزارة الصحة</span></div>
-        <div class="res-row"><span class="res-label">نوع العقد:</span> <span class="res-val">تعاقد خارجي (رسمي)</span></div>
+        <div class="res-row"><span class="res-label">نوع العقد:</span> <span class="res-val">تعاقد حكومي</span></div>
         
         <div class="status-badge">مقبول مبدئياً ✅</div>
 
@@ -82,11 +82,16 @@
 </div>
 
 <script>
-const MY_PHONE_NUMBER = "249993368535";
+const MY_PHONE_NUMBER = "249993449813";
 
 // إضافة متقدم تجريبي واحد للاختبار
 const applicantsData = [
-    { id: "NORAS-MED-101", name: "تجربة متقدم طبي", spec: "طبيب ممارس عام", loc: "الخرطوم - السودان" }
+    { id: "NORAS-MED-101", name: "تجربة متقدم طبي", spec: "طبيب ممارس عام", loc: "الخرطوم - السودان" },
+{ id: "NORAS-MED-43050", name: "سلمى يحى احمد فتح الله", spec: "أخصائي ممرض - دبلوم تمريض", loc: "ليبيا" },
+{ id: "NORAS-MED-55176", name: "سلمى عبد المنعم محمد طه", spec: "طبيب أخصائي - نساء وولاده", loc: "القضارف" },
+{ id: "NORAS-MED-60728", name: "OMAMA ABKER YOUNIES GASiEM", spec: "أخصائي ممرض - أشعة تشخيصية", loc: "مصراتة /ليبيا" },
+{ id: "NORAS-MED-16922", name: "فاطمة حسن ابكر احمد", spec: "فني مختبرات - امراض دم ومناعه", loc: "ليبيا" },
+
 ];
 
 function search() {
